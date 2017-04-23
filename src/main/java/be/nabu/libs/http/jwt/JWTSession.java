@@ -24,11 +24,16 @@ public class JWTSession implements Session {
 	private JWTSessionProvider provider;
 	private static Logger logger = LoggerFactory.getLogger(JWTSession.class);
 	private List<String> ids = new ArrayList<String>();
+	private JWTBody body;
 	
 	static JWTSession build(JWTSessionProvider provider, String id) {
 		if (id.matches(".+\\..+\\..+")) {
 			try {
 				JWTBody body = JWTUtils.decode(provider.getPublicKey() == null ? provider.getSecretKey() : provider.getPublicKey(), id);
+				// if the token is expired, it can no longer be used
+				if (body.getExp() != null && new Date(body.getExp() * 1000).before(new Date())) {
+					return null;
+				}
 				return new JWTSession(provider, id, body);
 			}
 			catch (ParseException e) {
@@ -40,6 +45,7 @@ public class JWTSession implements Session {
 	
 	JWTSession(JWTSessionProvider provider, String id, JWTBody body) {
 		this.provider = provider;
+		this.body = body;
 		this.ids.add(id);
 		this.original = provider.getOriginal().newSession();
 		
@@ -63,9 +69,13 @@ public class JWTSession implements Session {
 	private String generateId(Token token) {
 		String id = null;
 		if (token != null) {
-			JWTBody body = new JWTBody();
+			body = new JWTBody();
 			body.setIat(new Date().getTime() / 1000);
-			Date validUntil = token.getValidUntil() == null ? new Date(new Date().getTime() + provider.getTokenTimeout()) : token.getValidUntil();
+			// be valid at least as long as the token inside it
+			Date validUntil = new Date(new Date().getTime() + provider.getTokenTimeout());
+			if (token.getValidUntil() != null && token.getValidUntil().after(validUntil)) {
+				validUntil = token.getValidUntil();
+			}
 			body.setExp(validUntil.getTime() / 1000);
 			body.setRlm(token.getRealm());
 			body.setSub(token.getName());
@@ -104,6 +114,11 @@ public class JWTSession implements Session {
 		return original.get(name);
 	}
 
+	// currently resetting the token reinitiates the id
+	void regenerate() {
+		this.set(provider.getTokenKey(), original.get(provider.getTokenKey()));
+	}
+	
 	@Override
 	public void set(String name, Object value) {
 		if (provider.getTokenKey().equals(name)) {
@@ -124,6 +139,10 @@ public class JWTSession implements Session {
 
 	Session getOriginal() {
 		return original;
+	}
+
+	JWTBody getBody() {
+		return body;
 	}
 	
 }

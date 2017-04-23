@@ -22,7 +22,7 @@ public class RsaSignerValidator implements JWTSigner, JWTValidator {
 		try {
 			this.signature.initVerify((PublicKey) key);
 			this.signature.update(signedContent.getBytes("ASCII"));
-			return this.signature.verify(signature.getBytes("ASCII"));
+			return this.signature.verify(JWTUtils.base64Decode(signature.getBytes("ASCII")));
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);

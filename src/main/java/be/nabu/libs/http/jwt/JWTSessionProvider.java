@@ -3,6 +3,7 @@ package be.nabu.libs.http.jwt;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,10 @@ public class JWTSessionProvider implements SessionProvider {
 					sessions.put(sessionId, jwtSession);
 				}
 			}
+		}
+		// if the session has a valid jwt token but it is expired, let's generate a new one
+		else if (jwtSession.getBody() != null && jwtSession.getBody().getExp() != null && new Date(jwtSession.getBody().getExp() * 1000).before(new Date())) {
+			jwtSession.regenerate();
 		}
 		return jwtSession;
 	}

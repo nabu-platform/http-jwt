@@ -84,6 +84,7 @@ public class JWTUtils {
 	
 	private static byte[] marshal(ComplexContent content) throws IOException {
 		JSONBinding binding = new JSONBinding(content.getType(), Charset.forName("UTF-8"));
+		binding.setExpandKeyValuePairs(true);
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		binding.marshal(output, content);
 		return base64Encode(output.toByteArray());

@@ -10,16 +10,22 @@ import be.nabu.libs.authentication.api.Token;
 
 public class JWTToken implements Token {
 	private JWTBody body;
+	private String realm;
 	
 	private static final long serialVersionUID = 1L;
 	
 	public JWTToken(JWTBody body) {
+		this(body, null);
+	}
+	
+	public JWTToken(JWTBody body, String realm) {
 		this.body = body;
+		this.realm = realm;
 	}
 	
 	@Override
 	public String getRealm() {
-		return body.getRlm();
+		return realm == null ? body.getRlm() : realm;
 	}
 	
 	@Override

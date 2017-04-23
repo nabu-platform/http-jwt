@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>be.nabu.libs.http</groupId>
 	<artifactId>http-jwt</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>${be.nabu.libs.http-http-jwt-version}</version>
 	<packaging>jar</packaging>
 	<name>http-jwt</name>
 	<url>http://nabu.be</url>

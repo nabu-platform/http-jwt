@@ -9,11 +9,11 @@ public class JWTBody {
 	// reserved claims
 	
 	// expiration time
-	private long exp;
+	private Long exp;
 	// not before time
-	private long nbf;
+	private Long nbf;
 	// issued at time
-	private long iat;
+	private Long iat;
 	// issuer
 	private String iss;
 	// subject
@@ -34,19 +34,19 @@ public class JWTBody {
 	// any additional claims
 	private List<KeyValuePair> values;
 
-	public long getExp() {
+	public Long getExp() {
 		return exp;
 	}
 
-	public void setExp(long exp) {
+	public void setExp(Long exp) {
 		this.exp = exp;
 	}
 
-	public long getIat() {
+	public Long getIat() {
 		return iat;
 	}
 
-	public void setIat(long iat) {
+	public void setIat(Long iat) {
 		this.iat = iat;
 	}
 
@@ -90,11 +90,11 @@ public class JWTBody {
 		this.rlm = rlm;
 	}
 	
-	public long getNbf() {
+	public Long getNbf() {
 		return nbf;
 	}
 
-	public void setNbf(long nbf) {
+	public void setNbf(Long nbf) {
 		this.nbf = nbf;
 	}
 
