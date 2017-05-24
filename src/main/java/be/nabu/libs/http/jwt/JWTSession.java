@@ -31,7 +31,7 @@ public class JWTSession implements Session {
 			try {
 				JWTBody body = JWTUtils.decode(provider.getPublicKey() == null ? provider.getSecretKey() : provider.getPublicKey(), id);
 				// if the token is expired, it can no longer be used
-				if (body.getExp() != null && new Date(body.getExp() * 1000).before(new Date())) {
+				if (body.getExp() == null || new Date(body.getExp() * 1000).before(new Date())) {
 					return null;
 				}
 				return new JWTSession(provider, id, body);
@@ -61,7 +61,7 @@ public class JWTSession implements Session {
 			}
 			original.set(provider.getTokenKey(), deserialize);
 		}
-		else {
+		else if (body != null) {
 			original.set(provider.getTokenKey(), new JWTToken(body));
 		}
 	}
@@ -87,10 +87,10 @@ public class JWTSession implements Session {
 				body.setBdy(JWTUtils.encrypt(output.toByteArray(), provider.getSecretKey()));
 			}
 			if (provider.getPrivateKey() != null) {
-				id = JWTUtils.encode(provider.getPrivateKey(), body, JWTAlgorithm.RS512);	
+				id = JWTUtils.encode(provider.getPrivateKey(), body, JWTAlgorithm.RS256);	
 			}
 			else if (provider.getSecretKey() != null) {
-				id = JWTUtils.encode(provider.getSecretKey(), body, JWTAlgorithm.HS512);
+				id = JWTUtils.encode(provider.getSecretKey(), body, JWTAlgorithm.HS256);
 			}
 		}
 		if (id == null) {

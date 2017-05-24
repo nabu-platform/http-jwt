@@ -37,7 +37,6 @@ public class JWTUtils {
 			JWTHeader header = TypeUtils.getAsBean(
 				unmarshal((ComplexType) BeanResolver.getInstance().resolve(JWTHeader.class), parts[0].getBytes("ASCII")),
 				JWTHeader.class);
-			
 			// if we have a key, validate it
 			if (key != null) {
 				if (!header.getAlg().validate(key, parts[0] + "." + parts[1], parts[2])) {
@@ -58,7 +57,6 @@ public class JWTUtils {
 		JWTHeader header = new JWTHeader();
 		header.setAlg(algorithm);
 		header.setTyp(JWTType.JWT);
-		
 		try {
 			String headerContent = new String(marshal(new BeanInstance<JWTHeader>(header)), "ASCII");
 			String bodyContent = new String(marshal(new BeanInstance<JWTBody>(body)), "ASCII");
