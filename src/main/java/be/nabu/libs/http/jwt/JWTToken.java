@@ -14,6 +14,10 @@ public class JWTToken implements Token {
 	
 	private static final long serialVersionUID = 1L;
 	
+	public JWTToken() {
+		// auto construct
+	}
+	
 	public JWTToken(JWTBody body) {
 		this(body, null);
 	}
@@ -27,7 +31,8 @@ public class JWTToken implements Token {
 	public String getRealm() {
 		return realm == null ? body.getRlm() : realm;
 	}
-	
+
+	@XmlTransient
 	@Override
 	public String getName() {
 		return body.getSub();
@@ -44,4 +49,17 @@ public class JWTToken implements Token {
 	public List<Principal> getCredentials() {
 		return null;
 	}
+
+	public JWTBody getBody() {
+		return body;
+	}
+
+	public void setBody(JWTBody body) {
+		this.body = body;
+	}
+
+	public void setRealm(String realm) {
+		this.realm = realm;
+	}
+	
 }
