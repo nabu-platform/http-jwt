@@ -62,4 +62,14 @@ public class JWTToken implements Token {
 		this.realm = realm;
 	}
 	
+	// necessary for auto-reconstruct
+	public void setName(String name) {
+		// do nothing
+	}
+	public void setCredentials(List<Principal> credentials) {
+		// do nothing
+	}
+	public void setValidUntil(Date date) {
+		// do nothing
+	}
 }
