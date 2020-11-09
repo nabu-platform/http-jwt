@@ -58,10 +58,12 @@ public class JWTUtils {
 		header.setAlg(algorithm);
 		header.setTyp(JWTType.JWT);
 		try {
-			String headerContent = new String(marshal(new BeanInstance<JWTHeader>(header)), "ASCII");
-			String bodyContent = new String(marshal(new BeanInstance<JWTBody>(body)), "ASCII");
+			// in rfc 7515 (https://tools.ietf.org/html/rfc7515) they declare that the padding must be removed (even though padding is optional in base64url encoding)
+			// they also specify the need for base64url (as opposed to default base64) encoding
+			String headerContent = new String(marshal(new BeanInstance<JWTHeader>(header)), "ASCII").replaceAll("[=]+$", "");
+			String bodyContent = new String(marshal(new BeanInstance<JWTBody>(body)), "ASCII").replaceAll("[=]+$", "");
 			
-			String signature = algorithm.sign(key, headerContent + "." + bodyContent);
+			String signature = algorithm.sign(key, headerContent + "." + bodyContent).replaceAll("[=]+$", "");
 			
 			return headerContent + "." + bodyContent + "." + signature;
 		}
@@ -72,6 +74,7 @@ public class JWTUtils {
 	
 	public static byte[] base64Encode(byte [] content) throws IOException {
 		Base64Encoder transcoder = new Base64Encoder();
+		transcoder.setUseBase64Url(true);
 		transcoder.setBytesPerLine(0);
 		return IOUtils.toBytes(TranscoderUtils.transcodeBytes(IOUtils.wrap(content, true), transcoder));
 	}
