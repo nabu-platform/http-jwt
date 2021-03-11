@@ -80,7 +80,9 @@ public class JWTUtils {
 	}
 	
 	public static byte[] base64Decode(byte [] content) throws IOException {
-		return IOUtils.toBytes(TranscoderUtils.transcodeBytes(IOUtils.wrap(content, true), new Base64Decoder()));
+		Base64Decoder transcoder = new Base64Decoder();
+		transcoder.setUseBase64Url(true);
+		return IOUtils.toBytes(TranscoderUtils.transcodeBytes(IOUtils.wrap(content, true), transcoder));
 	}
 	
 	private static byte[] marshal(ComplexContent content) throws IOException {
