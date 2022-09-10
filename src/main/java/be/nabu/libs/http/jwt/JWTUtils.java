@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.security.Key;
 import java.text.ParseException;
+import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -15,6 +16,7 @@ import be.nabu.libs.http.jwt.enums.JWTType;
 import be.nabu.libs.types.TypeUtils;
 import be.nabu.libs.types.api.ComplexContent;
 import be.nabu.libs.types.api.ComplexType;
+import be.nabu.libs.types.api.KeyValuePair;
 import be.nabu.libs.types.binding.api.Window;
 import be.nabu.libs.types.binding.json.JSONBinding;
 import be.nabu.libs.types.java.BeanInstance;
@@ -25,6 +27,39 @@ import be.nabu.utils.codec.impl.Base64Encoder;
 import be.nabu.utils.io.IOUtils;
 
 public class JWTUtils {
+	
+	public static JWTBody decode(Map<String, Key> keys, String content) throws ParseException {
+		String[] parts = content.split("\\.");
+		if (parts.length != 3) {
+			throw new ParseException("Expecting three parts in the token: " + content, 0);
+		}
+		
+		try {
+			// decode the header
+			JWTHeader header = TypeUtils.getAsBean(
+				unmarshal((ComplexType) BeanResolver.getInstance().resolve(JWTHeader.class), parts[0].getBytes("ASCII")),
+				JWTHeader.class);
+			if (header.getValues() == null) {
+				throw new IllegalArgumentException("Could not determine key id from jwt header");
+			}
+			String keyId = null;
+			for (KeyValuePair pair : header.getValues()) {
+				if ("kid".equals(pair.getKey())) {
+					keyId = pair.getValue();
+				}
+			}
+			if (keyId == null) {
+				throw new IllegalArgumentException("Could not determine key id from jwt header");
+			}
+			else if (keys.get(keyId) == null) {
+				throw new IllegalArgumentException("The provided keys do not contain the requested key id: " + keyId);
+			}
+			return decode(keys.get(keyId), content);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	public static JWTBody decode(Key key, String content) throws ParseException {
 		String[] parts = content.split("\\.");
